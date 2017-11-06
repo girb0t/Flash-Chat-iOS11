@@ -12,7 +12,7 @@ import Firebase
 
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     // Declare instance variables here
-
+    var messageArray : [Message] = [Message]()
     
     // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
@@ -41,6 +41,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         //TODO: Register your MessageCell.xib file here:
         messageTableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "customMessageCell")
         configureTableView()
+        retrieveMessages()
     }
 
     ///////////////////////////////////////////
@@ -134,7 +135,16 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     //TODO: Create the retrieveMessages method here:
-    
+    func retrieveMessages() {
+        let MessageDB = FIRDatabase.database().reference().child("Messages")
+        MessageDB.observe(.childAdded, with: { (snapshot) in
+            let snapshotValue = snapshot.value as! Dictionary<String, String>
+            let text = snapshotValue["MessageBody"]!
+            let sender = snapshotValue["Sender"]!
+            
+            print (text, sender)
+        })
+    }
     
 
     
