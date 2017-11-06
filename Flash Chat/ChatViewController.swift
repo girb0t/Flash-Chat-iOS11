@@ -81,9 +81,6 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     //MARK:- TextField Delegate Methods
     
-    
-
-    
     //TODO: Declare textFieldDidBeginEditing here:
     func textFieldDidBeginEditing(_ textField: UITextField) {
         UIView.animate(withDuration: 0.5, animations: {
@@ -113,11 +110,27 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     
     @IBAction func sendPressed(_ sender: AnyObject) {
-        
-        
+        messageTextfield.endEditing(true)
+        messageTextfield.isEnabled = false
+        sendButton.isEnabled = false
         //TODO: Send the message to Firebase and save it in our database
+    
+        let messageDB = FIRDatabase.database().reference().child("Messages")
+        let messageDictionary = [
+            "Sender": FIRAuth.auth()?.currentUser?.email,
+            "MessageBody": messageTextfield.text!
+        ]
+        messageDB.childByAutoId().setValue(messageDictionary) {
+            (error, ref) in
+            if error != nil {
+                print(error!)
+            } else {
+                print("Message saved successfully")
+                self.resetControls()
+            }
+        }
         
-        
+
     }
     
     //TODO: Create the retrieveMessages method here:
@@ -136,6 +149,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             print ("Error signing out: \(signOutError)")
         }
         
+    }
+    
+    func resetControls() {
+        messageTextfield.isEnabled = true
+        sendButton.isEnabled = true
+        messageTextfield.text = ""
     }
     
     func throwErr() throws -> Int? {
